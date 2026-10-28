@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>金东快跑</title>
+<style>
+  :root {
+    --accent: #ffb703;
+    --bg: #0f172a;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    width: 100%; height: 100%;
+    overflow: hidden;
+    background: var(--bg);
+    font-family: "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+    -webkit-user-select: none; user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  #wrap {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  canvas {
+    display: block;
+    background: #87ceeb;
+    touch-action: none;
+  }
+
+  /* 覆盖层 */
+  .overlay {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    z-index: 10;
+    color: #fff;
+    text-align: center;
+    pointer-events: none;
+  }
+  .overlay.hidden { display: none; }
+  .panel {
+    pointer-events: auto;
+    background: rgba(15, 23, 42, 0.86);
+    border: 3px solid var(--accent);
+    border-radius: 20px;
+    padding: 26px 34px;
+    max-width: 86vw;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.45);
+  }
+  h1 {
+    font-size: 44px;
+    color: var(--accent);
+    letter-spacing: 4px;
+    text-shadow: 0 4px 0 rgba(0,0,0,0.35);
+    margin-bottom: 6px;
+  }
+  .subtitle { font-size: 15px; opacity: 0.85; margin-bottom: 6px; }
+  .stats { font-size: 18px; line-height: 1.9; margin: 10px 0; }
+  .stats b { color: var(--accent); font-size: 22px; }
+  .best { font-size: 14px; opacity: 0.8; }
+  button {
+    font-family: inherit;
+    font-size: 20px;
+    font-weight: bold;
+    color: #3b2400;
+    background: linear-gradient(#ffd34d, #ffb703);
+    border: none;
+    border-radius: 999px;
+    padding: 13px 42px;
+    cursor: pointer;
+    box-shadow: 0 6px 0 #cc8b00, 0 10px 18px rgba(0,0,0,0.35);
+    transition: transform .08s ease;
+  }
+  button:active { transform: translateY(4px); box-shadow: 0 2px 0 #cc8b00; }
+  .hint {
+    font-size: 13px;
+    opacity: 0.75;
+    line-height: 1.8;
+    margin-top: 4px;
+  }
+  .hint kbd {
+    background: #1e293b;
+    border: 1px solid #475569;
+    border-radius: 5px;
+    padding: 1px 7px;
+    font-family: inherit;
+  }
+  /* 结束界面：照片卡片，内容叠在照片上 */
+  #endScreen .panel {
+    padding: 0;
+    overflow: hidden;
+    width: min(70vw, 40vh);
+    aspect-ratio: 700 / 1024;
+    background: url('战败结算jpg.jpg') center / cover no-repeat;
+    display: flex;
+    align-items: flex-end;
+  }
+  #endScreen .panel > * {
+    width: 100%;
+  }
+  #endScreen .panel-inner {
+    padding: 60px 16px 18px;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.8) 45%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+  #endScreen h1, #endScreen .stats, #endScreen .best {
+    text-shadow: 0 3px 10px rgba(0, 0, 0, 0.9);
+  }
+</style>
+</head>
+<body>
+  <div id="wrap">
+    <canvas id="game"></canvas>
+  </div>
+
+  <!-- 开始界面 -->
+  <div class="overlay" id="startScreen">
+    <div class="panel">
+      <h1>金东快跑</h1>
+      <div class="subtitle">撞第一下没事，彬彬会追你5秒——期间再撞就被抓住！</div>
+      <div class="stats">🏃 左右换道 &nbsp;·&nbsp; ⬆ 跳跃 &nbsp;·&nbsp; ⬇ 下蹲</div>
+      <button id="startBtn">开 始</button>
+      <div class="hint">
+        键盘：<kbd>←</kbd><kbd>→</kbd> 换道 &nbsp; <kbd>↑</kbd> 跳 &nbsp; <kbd>↓</kbd> 蹲<br>
+        手机：左右滑动换道，上滑跳，下滑蹲
+      </div>
+    </div>
+  </div>
+
+  <!-- 结束界面 -->
+  <div class="overlay hidden" id="endScreen">
+    <div class="panel">
+      <div class="panel-inner">
+        <h1 style="font-size:26px;">被彬彬追上啦！</h1>
+        <div class="stats" style="font-size:16px; margin:2px 0;">
+          得分 <b id="finalScore">0</b><br>
+          距离 <b id="finalDist">0</b> m
+        </div>
+        <div class="best" id="bestText">最高分 0</div>
+        <button id="restartBtn" style="font-size:16px; padding:10px 30px;">再来一局</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>
